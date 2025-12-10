@@ -231,8 +231,20 @@ async function addBookToFirebase(event) {
 // ========== EDIT BOOK FUNCTION (FINAL) ==========
 let currentEditBookId = null;
 
-function openEditBookModal(bookId) {
-    alert("Modal edit belum dibuat, tetapi fungsi pemanggilan ada.");
+function openEditBookModal(bookId, bookData) {
+    currentEditBookId = bookId;
+
+    document.getElementById("editBookId").value = bookId;
+    document.getElementById("editBookTitle").value = bookData.title;
+    document.getElementById("editBookAuthor").value = bookData.author;
+    document.getElementById("editBookDescription").value = bookData.description;
+    document.getElementById("editBookCoverURL").value = bookData.coverURL || "";
+
+    document.getElementById("editBookModal").classList.remove("hidden");
+}
+
+function closeEditBookModal() {
+    document.getElementById("editBookModal").classList.add("hidden");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -259,7 +271,6 @@ async function saveEditedBook(event) {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert("Perubahan berhasil disimpan.");
         closeEditBookModal();
         loadAdminBooks();
 
@@ -267,8 +278,4 @@ async function saveEditedBook(event) {
         console.error("Error menyimpan perubahan:", error);
         alert("Gagal menyimpan perubahan.");
     }
-}
-
-function closeEditBookModal() {
-    alert("Modal edit belum ditutup karena modal belum dibuat.");
 }
