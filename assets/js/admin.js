@@ -50,7 +50,7 @@ async function loadAdminBooks() {
 }
 
 // Fungsi untuk tambah buku
-/* async function addBook(title, author, description, coverFile) {
+async function addBookModal(title, author, description, coverFile) {
     try {
         let coverURL = null;
         if (coverFile) {
@@ -72,7 +72,7 @@ async function loadAdminBooks() {
     } catch (error) {
         alert('Error: ' + error.message);
     }
-} */
+} 
 
 // Fungsi untuk edit buku (simplified)
 async function editBook(id) {
@@ -183,7 +183,7 @@ function closeAddBookModal() {
     document.getElementById('addBookForm').reset();
 }
 
-// Fungsi untuk submit tambah buku
+/* // Fungsi untuk submit tambah buku
 async function addBookModal(event) {
     event.preventDefault();
     const title = document.getElementById('bookTitle').value;
@@ -219,3 +219,4 @@ async function addBookModal(event) {
 // Event listener untuk form
 document.getElementById('addBookForm').addEventListener('submit', submitAddBook); 
 
+*/
