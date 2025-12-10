@@ -4,88 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kelola Buku - Sistem Perpustakaan Digital</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Firebase Compat -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
     <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Config & Logic -->
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth.js"></script>
     <script src="assets/js/admin.js"></script>
 </head>
+
 <body class="bg-gradient-to-br from-gray-50 to-slate-100 min-h-screen flex">
+
+    <!-- SIDEBAR -->
     <aside id="sidebar" class="bg-white/80 backdrop-blur-md shadow-lg w-64 min-h-screen p-4 hidden md:block">
         <h2 class="text-xl font-bold text-gray-800 mb-6">Admin Panel</h2>
+
         <nav class="space-y-4">
             <a href="dashboard-admin.html" class="block text-gray-700 hover:text-indigo-600">Dashboard</a>
-            <a href="admin-books.html" class="block text-gray-700 hover:text-indigo-600">Kelola Buku</a>
+            <a href="admin-books.html" class="block text-indigo-600 font-semibold">Kelola Buku</a>
             <a href="admin-borrows.html" class="block text-gray-700 hover:text-indigo-600">Kelola Peminjaman</a>
             <a href="members.html" class="block text-gray-700 hover:text-indigo-600">Kelola Member</a>
-            <button onclick="logout()" class="block w-full text-left bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Logout</button>
+
+            <button onclick="logout()" class="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700">
+                Logout
+            </button>
         </nav>
     </aside>
-    <div class="flex-1">
+
+    <!-- MAIN AREA -->
+    <main class="flex-1">
         <header class="bg-white/80 backdrop-blur-md shadow-lg p-4 md:hidden">
             <button onclick="toggleSidebar()" class="text-gray-800">☰ Menu</button>
         </header>
+
         <div class="container mx-auto p-8">
             <div class="bg-white/70 backdrop-blur-md shadow-xl rounded-2xl p-6">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Kelola Buku</h2>
-                <button onclick="showAddBookForm()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-300 mb-4">Tambah Buku</button>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Kelola Buku</h2>
+                    <button onclick="showAddBookForm()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Tambah Buku
+                    </button>
+                </div>
+
                 <div id="booksList" class="space-y-4">
-                    <!-- Daftar buku akan dimuat di sini -->
+                    <!-- Card buku di-load di sini -->
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- Modal Tambah Buku -->
+    <!-- MODAL TAMBAH BUKU -->
     <div id="addBookModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">Tambah Buku Baru</h3>
+        <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md">
+            <h3 class="text-xl font-bold mb-4">Tambah Buku Baru</h3>
+
             <form id="addBookForm" class="space-y-4">
-                <input type="text" id="bookTitle" placeholder="Judul Buku" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                <input type="text" id="bookAuthor" placeholder="Penulis" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
-                <textarea id="bookDescription" placeholder="Deskripsi" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" required></textarea>
-                <input type="text" id="bookCoverURL" placeholder="URL Gambar Cover (opsional)" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <div class="flex space-x-2">
-                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">Tambah</button>
-                    <button type="button" onclick="closeAddBookModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300">Batal</button>
+                <input id="bookTitle" type="text" placeholder="Judul Buku" class="w-full p-3 border rounded-lg" required>
+                <input id="bookAuthor" type="text" placeholder="Penulis" class="w-full p-3 border rounded-lg" required>
+                <textarea id="bookDescription" placeholder="Deskripsi" class="w-full p-3 border rounded-lg" rows="3" required></textarea>
+                <input id="bookCoverURL" type="text" placeholder="URL Gambar Cover (opsional)" class="w-full p-3 border rounded-lg">
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeAddBookModal()" class="bg-gray-500 text-white px-4 py-2 rounded-lg">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700">
+                        Tambah
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Edit Book Modal -->
+    <!-- MODAL EDIT BUKU -->
     <div id="editBookModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-    <div class="bg-white p-6 rounded-xl w-full max-w-md">
-        <h2 class="text-xl font-bold mb-4">Edit Buku</h2>
+        <div class="bg-white p-6 rounded-xl w-full max-w-md">
+            <h2 class="text-xl font-bold mb-4">Edit Buku</h2>
 
-        <form id="editBookForm">
-            <input type="hidden" id="editBookId">
+            <form id="editBookForm">
+                <input type="hidden" id="editBookId">
 
-            <label class="block">Judul</label>
-            <input id="editBookTitle" class="w-full p-2 border rounded mb-3">
+                <label>Judul</label>
+                <input id="editBookTitle" class="w-full p-2 border rounded mb-3">
 
-            <label class="block">Penulis</label>
-            <input id="editBookAuthor" class="w-full p-2 border rounded mb-3">
+                <label>Penulis</label>
+                <input id="editBookAuthor" class="w-full p-2 border rounded mb-3">
 
-            <label class="block">Deskripsi</label>
-            <textarea id="editBookDescription" class="w-full p-2 border rounded mb-3"></textarea>
+                <label>Deskripsi</label>
+                <textarea id="editBookDescription" class="w-full p-2 border rounded mb-3"></textarea>
 
-            <label class="block">Cover URL (opsional)</label>
-            <input id="editBookCoverURL" class="w-full p-2 border rounded mb-4">
+                <label>Cover URL (opsional)</label>
+                <input id="editBookCoverURL" class="w-full p-2 border rounded mb-4">
 
-            <div class="flex justify-end gap-2">
-                <button type="button" onclick="closeEditBookModal()" class="bg-gray-400 text-white px-4 py-1 rounded">Batal</button>
-                <button type="submit" class="bg-blue-600 text-white px-4 py-1 rounded">Simpan</button>
-            </div>
-        </form>
+                <div class="flex justify-end gap-2">
+                    <button type="button" onclick="closeEditBookModal()" class="bg-gray-500 text-white px-4 py-2 rounded">
+                        Batal
+                    </button>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                        Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
-
-
 
     <script>
         checkAuthAndRole('admin');
