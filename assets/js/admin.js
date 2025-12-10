@@ -144,3 +144,30 @@ function showAddBookForm() {
     // Implementasi form tambah buku (bisa tambah modal)
     alert('Fitur tambah buku belum diimplementasi lengkap.');
 }
+
+// Fungsi untuk load daftar member
+async function loadMembers() {
+    const membersList = document.getElementById('membersList');
+    membersList.innerHTML = '';
+    const membersSnapshot = await firebase.firestore().collection('users').where('role', '==', 'member').get();
+    membersSnapshot.forEach(doc => {
+        const member = doc.data();
+        const memberItem = `
+            <div class="bg-white shadow-lg rounded-lg p-4 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold">${member.name}</h3>
+                    <p>Email: ${member.email}</p>
+                    <p>Role: ${member.role}</p>
+                </div>
+                <div>
+                    <button onclick="viewMemberDetails('${doc.id}')" class="bg-blue-500 text-white px-3 py-1 rounded">Lihat Detail</button>
+                </div>
+            </div>
+        `;
+        membersList.innerHTML += memberItem;
+    });
+}
+// Fungsi untuk lihat detail member (opsional, bisa diperluas)
+function viewMemberDetails(id) {
+    alert('Fitur detail member belum diimplementasi lengkap. ID: ' + id);
+}
