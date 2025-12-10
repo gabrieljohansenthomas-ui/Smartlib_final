@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinjam Buku - Sistem Perpustakaan Digital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/borrows.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <nav class="bg-white/80 backdrop-blur-md shadow-lg p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold text-gray-800">Pinjam Buku</h1>
+            <div class="space-x-4">
+                <a href="dashboard-member.html" class="text-indigo-600 hover:underline">Dashboard</a>
+                <button onclick="logout()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-300">Logout</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto p-8">
+        <div class="bg-white/70 backdrop-blur-md shadow-xl rounded-2xl p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Form Peminjaman Buku</h2>
+            <form id="borrowForm" class="space-y-4">
+                <select id="bookSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                    <option value="">Pilih Buku</option>
+                    <!-- Opsi buku akan dimuat di sini -->
+                </select>
+                <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300">Ajukan Peminjaman</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        checkAuthAndRole('member');
+        loadBorrowForm();
+    </script>
+</body>
+</html>
