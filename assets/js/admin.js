@@ -49,7 +49,7 @@ async function loadAdminBooks() {
     });
 }
 
-// Fungsi untuk tambah buku
+/* // Fungsi untuk tambah buku
 async function addBookModal(title, author, description, coverFile) {
     try {
         let coverURL = null;
@@ -72,7 +72,7 @@ async function addBookModal(title, author, description, coverFile) {
     } catch (error) {
         alert('Error: ' + error.message);
     }
-} 
+} */
 
 // Fungsi untuk edit buku (simplified)
 async function editBook(id) {
@@ -220,3 +220,50 @@ async function addBookModal(event) {
 document.getElementById('addBookForm').addEventListener('submit', submitAddBook); 
 
 */
+
+// Membuka modal tambah buku
+function showAddBookForm() {
+    document.getElementById('addBookModal').classList.remove('hidden');
+}
+
+// Menutup modal
+function closeAddBookModal() {
+    document.getElementById('addBookModal').classList.add('hidden');
+}
+
+// Submit form tambah buku
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('addBookForm');
+    if (!form) return;
+
+    form.addEventListener('submit', addBookModal);
+});
+
+// Fungsi tambah buku (versi cocok HTML)
+async function addBookModal(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('bookTitle').value.trim();
+    const author = document.getElementById('bookAuthor').value.trim();
+    const description = document.getElementById('bookDescription').value.trim();
+    const coverURL = document.getElementById('bookCoverURL').value.trim() || null;
+
+    try {
+        await firebase.firestore().collection('books').add({
+            title: title,
+            author: author,
+            description: description,
+            coverURL: coverURL,
+            available: true,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert('Buku berhasil ditambah!');
+        closeAddBookModal();
+        document.getElementById('addBookForm').reset();
+        loadAdminBooks();
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
