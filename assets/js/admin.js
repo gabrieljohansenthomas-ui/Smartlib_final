@@ -50,9 +50,9 @@ async function loadAdminBooks() {
 }
 
 // Fungsi edit (versi placeholder)
-async function editBook(id) {
+/* async function editBook(id) {
     alert('Fitur edit belum diimplementasi lengkap.');
-}
+} */ 
 
 // Fungsi hapus buku
 async function deleteBook(id) {
@@ -62,50 +62,183 @@ async function deleteBook(id) {
     }
 }
 
-// Fungsi load peminjaman
+// ADMIN - KELOLA PEMINJAMAN
+
 async function loadAdminBorrows() {
     const borrowsList = document.getElementById('borrowsList');
     borrowsList.innerHTML = '';
 
-    const borrowsSnapshot = await firebase.firestore().collection('borrow_records').get();
-    borrowsSnapshot.forEach(async doc => {
-        const borrow = doc.data();
-        const userDoc = await firebase.firestore().collection('users').doc(borrow.userId).get();
-        const bookDoc = await firebase.firestore().collection('books').doc(borrow.bookId).get();
-        const borrowItem = `
-            <div class="bg-white shadow-lg rounded-lg p-4">
-                <p>User: ${userDoc.data().name}</p>
-                <p>Buku: ${bookDoc.data().title}</p>
-                <p>Status: ${borrow.status}</p>
-                <button onclick="approveBorrow('${doc.id}')" class="bg-green-500 text-white px-3 py-1 rounded mr-2">Approve</button>
-                <button onclick="rejectBorrow('${doc.id}')" class="bg-red-500 text-white px-3 py-1 rounded mr-2">Reject</button>
-                <button onclick="returnBook('${doc.id}')" class="bg-blue-500 text-white px-3 py-1 rounded">Kembalikan</button>
-            </div>
-        `;
-        borrowsList.innerHTML += borrowItem;
-    });
+    try {
+        const snapshot = await firebase.firestore()
+            .collection('borrow_records')
+            .orderBy('borrowDate', 'desc') // Pastikan semua dokumen punya borrowDate
+            .get();
+
+        if (snapshot.empty) {
+            borrowsList.innerHTML = '<p class="text-gray-500">Belum ada peminjaman.</p>';
+            return;
+        }
+
+        for (const doc of snapshot.docs) {
+            const borrow = doc.data();
+
+            // Ambil user
+            let user = { name: "User tidak ditemukan" };
+            if (borrow.userId) {
+                const userDoc = await firebase.firestore()
+                    .collection('users')
+                    .doc(borrow.userId)
+                    .get();
+                if (userDoc.exists) user = userDoc.data();
+            }
+
+            // Ambil buku
+            let book = { title: "Buku tidak ditemukan" };
+            if (borrow.bookId) {
+                const bookDoc = await firebase.firestore()
+                    .collection('books')
+                    .doc(borrow.bookId)
+                    .get();
+                if (bookDoc.exists) book = bookDoc.data();
+            }
+
+            // Tanggal
+            const borrowDate = borrow.borrowDate?.toDate().toLocaleDateString() || "-";
+            const returnDate = borrow.returnDate
+                ? borrow.returnDate.toDate().toLocaleDateString()
+                : null;
+
+            // Warna status
+            let statusColor = "text-gray-700";
+            switch (borrow.status) {
+                case "pending": statusColor = "text-yellow-600"; break;
+                case "approved": statusColor = "text-green-600"; break;
+                case "rejected": statusColor = "text-red-600"; break;
+                case "returned": statusColor = "text-blue-600"; break;
+            }
+
+            // Render item
+            const item = document.createElement("div");
+            item.className = "bg-white shadow-lg rounded-xl p-5 border border-gray-200";
+
+            item.innerHTML = `
+                <p><span class="font-semibold">User:</span> ${user.name}</p>
+                <p><span class="font-semibold">Buku:</span> ${book.title}</p>
+                <p class="${statusColor}"><span class="font-semibold">Status:</span> ${borrow.status}</p>
+                <p><span class="font-semibold">Tgl Pinjam:</span> ${borrowDate}</p>
+                ${returnDate ? `<p><span class="font-semibold">Tgl Kembali:</span> ${returnDate}</p>` : ""}
+                <div class="mt-3 space-x-2">
+                    ${borrow.status === "pending"
+                        ? `<button onclick="approveBorrow('${doc.id}', '${borrow.bookId}')"
+                             class="bg-green-600 text-white px-3 py-1 rounded-lg">Approve</button>
+                           <button onclick="rejectBorrow('${doc.id}')"
+                             class="bg-red-600 text-white px-3 py-1 rounded-lg">Reject</button>`
+                        : ""
+                    }
+                    ${borrow.status === "approved"
+                        ? `<button onclick="returnBook('${doc.id}', '${borrow.bookId}')"
+                             class="bg-blue-600 text-white px-3 py-1 rounded-lg">Kembalikan</button>`
+                        : ""
+                    }
+                    <button onclick="deleteBorrow('${doc.id}')"
+                        class="bg-gray-600 text-white px-3 py-1 rounded-lg">Hapus</button>
+                </div>
+            `;
+
+            borrowsList.appendChild(item);
+        }
+
+    } catch (error) {
+        console.error("Error load admin borrows:", error);
+        borrowsList.innerHTML = '<p class="text-red-600">Gagal memuat peminjaman.</p>';
+    }
 }
 
-// Approve
-async function approveBorrow(id) {
-    await firebase.firestore().collection('borrow_records').doc(id).update({ status: 'approved' });
-    loadAdminBorrows();
+
+// ======================================================
+// APPROVE PEMINJAMAN
+// ======================================================
+async function approveBorrow(borrowId, bookId) {
+    try {
+        if (!borrowId || !bookId) return;
+
+        await firebase.firestore().collection('borrow_records').doc(borrowId).update({
+            status: 'approved'
+        });
+
+        await firebase.firestore().collection('books').doc(bookId).update({
+            available: false
+        });
+
+        loadAdminBorrows();
+    } catch (error) {
+        console.error("Gagal approve:", error);
+        alert("Gagal approve peminjaman.");
+    }
 }
 
-// Reject
-async function rejectBorrow(id) {
-    await firebase.firestore().collection('borrow_records').doc(id).update({ status: 'rejected' });
-    loadAdminBorrows();
+
+// ======================================================
+// REJECT PEMINJAMAN
+// ======================================================
+async function rejectBorrow(borrowId) {
+    try {
+        if (!borrowId) return;
+
+        await firebase.firestore().collection('borrow_records').doc(borrowId).update({
+            status: 'rejected'
+        });
+
+        loadAdminBorrows();
+    } catch (error) {
+        console.error("Gagal reject:", error);
+        alert("Gagal menolak peminjaman.");
+    }
 }
 
-// Return
-async function returnBook(id) {
-    await firebase.firestore().collection('borrow_records').doc(id).update({
-        status: 'returned',
-        returnDate: firebase.firestore.Timestamp.now()
-    });
-    loadAdminBorrows();
+
+// ======================================================
+// RETURN BOOK
+// ======================================================
+async function returnBook(borrowId, bookId) {
+    try {
+        if (!borrowId || !bookId) return;
+
+        await firebase.firestore().collection('borrow_records').doc(borrowId).update({
+            status: 'returned',
+            returnDate: firebase.firestore.Timestamp.now()
+        });
+
+        await firebase.firestore().collection('books').doc(bookId).update({
+            available: true
+        });
+
+        loadAdminBorrows();
+    } catch (error) {
+        console.error("Gagal mengembalikan buku:", error);
+        alert("Gagal mengembalikan buku.");
+    }
 }
+
+// ======================================================
+// DELETE PEMINJAMAN
+// ======================================================
+async function deleteBorrow(borrowId) {
+    if (!borrowId) return;
+    const confirmDelete = confirm("Apakah Anda yakin ingin menghapus peminjaman ini?");
+    if (!confirmDelete) return;
+
+    try {
+        await firebase.firestore().collection('borrow_records').doc(borrowId).delete();
+        alert("Peminjaman berhasil dihapus.");
+        loadAdminBorrows();
+    } catch (error) {
+        console.error("Gagal menghapus peminjaman:", error);
+        alert("Gagal menghapus peminjaman. " + error.message);
+    }
+}
+
+
 
 // Toggle sidebar
 function toggleSidebar() {
@@ -228,19 +361,39 @@ async function addBookToFirebase(event) {
     }
 }
 
-// ========== EDIT BOOK FUNCTION (FINAL) ==========
-let currentEditBookId = null;
+// ========== EDIT BOOK FUNCTION (FINAL, SESUAI PLACEHOLDER) ==========
 
-function openEditBookModal(bookId, bookData) {
-    currentEditBookId = bookId;
+// Entry point seperti placeholder:
+// async function editBook(id) { ... }
+async function editBook(bookId) {
+    try {
+        const docRef = firebase.firestore().collection("books").doc(bookId);
+        const snapshot = await docRef.get();
 
-    document.getElementById("editBookId").value = bookId;
-    document.getElementById("editBookTitle").value = bookData.title;
-    document.getElementById("editBookAuthor").value = bookData.author;
-    document.getElementById("editBookDescription").value = bookData.description;
-    document.getElementById("editBookCoverURL").value = bookData.coverURL || "";
+        if (!snapshot.exists) {
+            alert("Data buku tidak ditemukan.");
+            return;
+        }
 
-    document.getElementById("editBookModal").classList.remove("hidden");
+        const bookData = snapshot.data();
+
+        // Simpan ID buku yang sedang diedit
+        currentEditBookId = bookId;
+
+        // Isi form di modal
+        document.getElementById("editBookId").value = bookId;
+        document.getElementById("editBookTitle").value = bookData.title;
+        document.getElementById("editBookAuthor").value = bookData.author;
+        document.getElementById("editBookDescription").value = bookData.description;
+        document.getElementById("editBookCoverURL").value = bookData.coverURL || "";
+
+        // Tampilkan modal
+        document.getElementById("editBookModal").classList.remove("hidden");
+
+    } catch (error) {
+        console.error("Error membuka form edit:", error);
+        alert("Terjadi kesalahan membuka data untuk diedit.");
+    }
 }
 
 function closeEditBookModal() {

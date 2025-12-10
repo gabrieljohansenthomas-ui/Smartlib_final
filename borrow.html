@@ -30,15 +30,23 @@
             <form id="borrowForm" class="space-y-4">
                 <select id="bookSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
                     <option value="">Pilih Buku</option>
-                    <!-- Opsi buku akan dimuat di sini -->
                 </select>
                 <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300">Ajukan Peminjaman</button>
             </form>
         </div>
     </div>
+
     <script>
-        checkAuthAndRole('member');
-        loadBorrowForm();
+        // Tunggu auth siap sebelum load data
+        firebase.auth().onAuthStateChanged(async user => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            // Pastikan role member
+            await checkAuthAndRole('member');
+        });
     </script>
 </body>
 </html>
