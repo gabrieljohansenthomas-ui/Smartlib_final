@@ -233,16 +233,16 @@ function closeAddBookModal() {
     document.getElementById('addBookModal').classList.add('hidden');
 }
 
-// Pasang event listener setelah DOM siap
+// Ketika halaman selesai dimuat, pasang event listener untuk form
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addBookForm');
     if (form) {
-        form.addEventListener('submit', addBookToDatabase);
+        form.addEventListener('submit', addBookToFirebase);
     }
 });
 
-// Fungsi untuk tambah buku ke Firestore
-async function addBookToDatabase(event) {
+// Fungsi utama: menambah buku ke Firestore
+async function addBookToFirebase(event) {
     event.preventDefault();
 
     const title = document.getElementById('bookTitle').value.trim();
@@ -260,20 +260,22 @@ async function addBookToDatabase(event) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        console.log("Berhasil menambah buku dengan ID:", docRef.id);
-        alert("Buku berhasil ditambah!");
+        console.log("Buku berhasil ditambah. ID:", docRef.id);
+        alert("Buku berhasil ditambah.");
 
-        // Reset form dan tutup modal
+        // Reset form
         document.getElementById('addBookForm').reset();
+
+        // Tutup modal
         closeAddBookModal();
 
         // Refresh daftar buku
-        if (typeof loadAdminBooks === 'function') {
+        if (typeof loadAdminBooks === "function") {
             loadAdminBooks();
         }
+
     } catch (error) {
-        console.error("Gagal menambah buku:", error);
-        alert("Terjadi error: " + error.message);
+        console.error("Error menambah buku:", error);
+        alert("Error: " + error.message);
     }
 }
-
