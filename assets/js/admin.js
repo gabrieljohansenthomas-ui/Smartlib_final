@@ -222,7 +222,7 @@ document.getElementById('addBookForm').addEventListener('submit', submitAddBook)
 <script type="module">
 import { db } from './firebase-config.js';
 import { collection, addDoc, serverTimestamp } 
-    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+    from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
 // === OPEN/CLOSE MODAL ===
 function openAddBookModal() {
