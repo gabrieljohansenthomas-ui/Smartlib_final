@@ -38,6 +38,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal Tambah Buku -->
+    <div id="addBookModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Tambah Buku Baru</h3>
+            <form id="addBookForm" class="space-y-4">
+                <input type="text" id="bookTitle" placeholder="Judul Buku" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                <input type="text" id="bookAuthor" placeholder="Penulis" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                <textarea id="bookDescription" placeholder="Deskripsi" class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3" required></textarea>
+                <input type="file" id="bookCover" accept="image/*" class="w-full p-3 border border-gray-300 rounded-lg">
+                <div class="flex space-x-2">
+                    <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-300">Tambah</button>
+                    <button type="button" onclick="closeAddBookModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-300">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
     <script>
         checkAuthAndRole('admin');
         loadAdminBooks();
