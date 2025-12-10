@@ -183,7 +183,7 @@ function closeAddBookModal() {
     document.getElementById('addBookForm').reset();
 }
 
-// Fungsi untuk submit tambah buku
+/* // Fungsi untuk submit tambah buku
 async function addBookModal(event) {
     event.preventDefault();
     const title = document.getElementById('bookTitle').value;
@@ -217,4 +217,57 @@ async function addBookModal(event) {
 }
 
 // Event listener untuk form
+document.getElementById('addBookForm').addEventListener('submit', submitAddBook); */
+
+<script type="module">
+import { db } from './firebase-config.js';
+import { collection, addDoc, serverTimestamp } 
+    from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+// === OPEN/CLOSE MODAL ===
+function openAddBookModal() {
+    document.getElementById('addBookModal').classList.remove('hidden');
+}
+function closeAddBookModal() {
+    document.getElementById('addBookModal').classList.add('hidden');
+}
+
+window.openAddBookModal = openAddBookModal;
+window.closeAddBookModal = closeAddBookModal;
+
+
+// === FORM SUBMIT ===
 document.getElementById('addBookForm').addEventListener('submit', submitAddBook);
+
+async function submitAddBook(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('bookTitle').value.trim();
+    const author = document.getElementById('bookAuthor').value.trim();
+    const description = document.getElementById('bookDescription').value.trim();
+    const coverURL = document.getElementById('bookCoverURL').value.trim() || null;
+
+    if (!title || !author || !description) {
+        alert("Lengkapi semua field wajib.");
+        return;
+    }
+
+    try {
+        await addDoc(collection(db, "books"), {
+            title,
+            author,
+            description,
+            coverURL, // langsung simpan url
+            createdAt: serverTimestamp()
+        });
+
+        alert("Buku berhasil ditambahkan.");
+        closeAddBookModal();
+        document.getElementById('addBookForm').reset();
+    } catch (error) {
+        console.error("Firestore error:", error);
+        alert("Gagal menyimpan data.");
+    }
+}
+</script>
+
