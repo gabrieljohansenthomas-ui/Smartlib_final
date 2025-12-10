@@ -49,38 +49,12 @@ async function loadAdminBooks() {
     });
 }
 
-/* // Fungsi untuk tambah buku
-async function addBookModal(title, author, description, coverFile) {
-    try {
-        let coverURL = null;
-        if (coverFile) {
-            const storageRef = firebase.storage().ref();
-            const coverRef = storageRef.child(`covers/${Date.now()}`);
-            await coverRef.put(coverFile);
-            coverURL = await coverRef.getDownloadURL();
-        }
-
-        await firebase.firestore().collection('books').add({
-            title: title,
-            author: author,
-            description: description,
-            coverURL: coverURL,
-            available: true
-        });
-        alert('Buku berhasil ditambah!');
-        loadAdminBooks();
-    } catch (error) {
-        alert('Error: ' + error.message);
-    }
-} */
-
-// Fungsi untuk edit buku (simplified)
+// Fungsi edit (versi placeholder)
 async function editBook(id) {
-    // Implementasi edit form (bisa tambah modal)
     alert('Fitur edit belum diimplementasi lengkap.');
 }
 
-// Fungsi untuk hapus buku
+// Fungsi hapus buku
 async function deleteBook(id) {
     if (confirm('Hapus buku ini?')) {
         await firebase.firestore().collection('books').doc(id).delete();
@@ -88,7 +62,7 @@ async function deleteBook(id) {
     }
 }
 
-// Fungsi untuk load daftar peminjaman admin
+// Fungsi load peminjaman
 async function loadAdminBorrows() {
     const borrowsList = document.getElementById('borrowsList');
     borrowsList.innerHTML = '';
@@ -112,19 +86,19 @@ async function loadAdminBorrows() {
     });
 }
 
-// Fungsi untuk approve peminjaman
+// Approve
 async function approveBorrow(id) {
     await firebase.firestore().collection('borrow_records').doc(id).update({ status: 'approved' });
     loadAdminBorrows();
 }
 
-// Fungsi untuk reject peminjaman
+// Reject
 async function rejectBorrow(id) {
     await firebase.firestore().collection('borrow_records').doc(id).update({ status: 'rejected' });
     loadAdminBorrows();
 }
 
-// Fungsi untuk return buku
+// Return
 async function returnBook(id) {
     await firebase.firestore().collection('borrow_records').doc(id).update({
         status: 'returned',
@@ -133,22 +107,28 @@ async function returnBook(id) {
     loadAdminBorrows();
 }
 
-// Fungsi untuk toggle sidebar (responsif)
+// Toggle sidebar
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     sidebar.classList.toggle('hidden');
 }
 
-// Fungsi untuk show add book form (simplified)
+// Placeholder tampilan form
 function showAddBookForm() {
-    // Implementasi form tambah buku (bisa tambah modal)
-    alert('Fitur tambah buku belum diimplementasi lengkap.');
+    document.getElementById('addBookModal').classList.remove('hidden');
 }
 
-// Fungsi untuk load daftar member
+function closeAddBookModal() {
+    document.getElementById('addBookModal').classList.add('hidden');
+    const form = document.getElementById('addBookForm');
+    if (form) form.reset();
+}
+
+// Load member
 async function loadMembers() {
     const membersList = document.getElementById('membersList');
     membersList.innerHTML = '';
+
     const membersSnapshot = await firebase.firestore().collection('users').where('role', '==', 'member').get();
     membersSnapshot.forEach(doc => {
         const member = doc.data();
@@ -167,29 +147,18 @@ async function loadMembers() {
         membersList.innerHTML += memberItem;
     });
 }
-// Fungsi untuk lihat detail member (opsional, bisa diperluas)
+
 function viewMemberDetails(id) {
     alert('Fitur detail member belum diimplementasi lengkap. ID: ' + id);
 }
 
-// Fungsi untuk tampilkan modal tambah buku
-function showAddBookForm() {
-    document.getElementById('addBookModal').classList.remove('hidden');
-}
-
-// Fungsi untuk tutup modal
-function closeAddBookModal() {
-    document.getElementById('addBookModal').classList.add('hidden');
-    document.getElementById('addBookForm').reset();
-}
-
-/* // Fungsi untuk submit tambah buku
+// KUMPULAN FUNGSI ADD BOOK VERSI LAMA (dipertahankan)
 async function addBookModal(event) {
     event.preventDefault();
     const title = document.getElementById('bookTitle').value;
     const author = document.getElementById('bookAuthor').value;
     const description = document.getElementById('bookDescription').value;
-    const coverFile = document.getElementById('bookCover').files[0];
+    const coverFile = document.getElementById('bookCover')?.files?.[0];
 
     try {
         let coverURL = null;
@@ -210,30 +179,16 @@ async function addBookModal(event) {
 
         alert('Buku berhasil ditambahkan!');
         closeAddBookModal();
-        loadAdminBooks(); // Reload daftar buku
+        loadAdminBooks();
     } catch (error) {
         alert('Error: ' + error.message);
     }
 }
 
-// Event listener untuk form
-document.getElementById('addBookForm').addEventListener('submit', submitAddBook); 
+// Listener lama (dipertahankan)
+document.getElementById('addBookForm')?.addEventListener('submit', submitAddBook);
 
-*/
-
-// Pastikan Firebase sudah di-init dari firebase-config.js
-
-// Buka modal
-function showAddBookForm() {
-    document.getElementById('addBookModal').classList.remove('hidden');
-}
-
-// Tutup modal
-function closeAddBookModal() {
-    document.getElementById('addBookModal').classList.add('hidden');
-}
-
-// Ketika halaman selesai dimuat, pasang event listener untuk form
+// FUNGSI FINAL: addBookToFirebase (versi aktif)
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addBookForm');
     if (form) {
@@ -241,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Fungsi utama: menambah buku ke Firestore
+// Tambah buku ke Firestore
 async function addBookToFirebase(event) {
     event.preventDefault();
 
@@ -263,19 +218,57 @@ async function addBookToFirebase(event) {
         console.log("Buku berhasil ditambah. ID:", docRef.id);
         alert("Buku berhasil ditambah.");
 
-        // Reset form
         document.getElementById('addBookForm').reset();
-
-        // Tutup modal
         closeAddBookModal();
-
-        // Refresh daftar buku
-        if (typeof loadAdminBooks === "function") {
-            loadAdminBooks();
-        }
+        loadAdminBooks();
 
     } catch (error) {
         console.error("Error menambah buku:", error);
         alert("Error: " + error.message);
     }
+}
+
+// ========== EDIT BOOK FUNCTION (FINAL) ==========
+let currentEditBookId = null;
+
+function openEditBookModal(bookId) {
+    alert("Modal edit belum dibuat, tetapi fungsi pemanggilan ada.");
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const editForm = document.getElementById("editBookForm");
+    if (editForm) {
+        editForm.addEventListener("submit", saveEditedBook);
+    }
+});
+
+async function saveEditedBook(event) {
+    event.preventDefault();
+
+    const newTitle = document.getElementById("editBookTitle").value.trim();
+    const newAuthor = document.getElementById("editBookAuthor").value.trim();
+    const newDescription = document.getElementById("editBookDescription").value.trim();
+    const newCoverURL = document.getElementById("editBookCoverURL").value.trim() || null;
+
+    try {
+        await firebase.firestore().collection("books").doc(currentEditBookId).update({
+            title: newTitle,
+            author: newAuthor,
+            description: newDescription,
+            coverURL: newCoverURL,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        alert("Perubahan berhasil disimpan.");
+        closeEditBookModal();
+        loadAdminBooks();
+
+    } catch (error) {
+        console.error("Error menyimpan perubahan:", error);
+        alert("Gagal menyimpan perubahan.");
+    }
+}
+
+function closeEditBookModal() {
+    alert("Modal edit belum ditutup karena modal belum dibuat.");
 }
