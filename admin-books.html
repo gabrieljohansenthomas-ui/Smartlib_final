@@ -56,7 +56,29 @@
             </form>
         </div>
     </div>
-    
+
+    <!-- Modal Edit Buku -->
+    <div id="editBookModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white/90 backdrop-blur-md shadow-2xl rounded-2xl p-6 w-full max-w-md">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Edit Buku</h3>
+        <form id="editBookForm" class="space-y-4">
+            <input type="text" id="editBookTitle" placeholder="Judul Buku" class="w-full p-3 border rounded-lg" required>
+            <input type="text" id="editBookAuthor" placeholder="Penulis" class="w-full p-3 border rounded-lg" required>
+            <textarea id="editBookDescription" placeholder="Deskripsi" class="w-full p-3 border rounded-lg" rows="3" required></textarea>
+            <input type="text" id="editBookCoverURL" placeholder="URL Cover" class="w-full p-3 border rounded-lg">
+
+            <div class="flex space-x-2">
+                <button type="submit" class="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700">
+                    Simpan Perubahan
+                </button>
+                <button type="button" onclick="closeEditBookModal()" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
+                    Batal
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
     <script>
         checkAuthAndRole('admin');
         loadAdminBooks();
