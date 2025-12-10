@@ -221,26 +221,28 @@ document.getElementById('addBookForm').addEventListener('submit', submitAddBook)
 
 */
 
-// Membuka modal tambah buku
+// Pastikan Firebase sudah di-init dari firebase-config.js
+
+// Buka modal
 function showAddBookForm() {
     document.getElementById('addBookModal').classList.remove('hidden');
 }
 
-// Menutup modal
+// Tutup modal
 function closeAddBookModal() {
     document.getElementById('addBookModal').classList.add('hidden');
 }
 
-// Submit form tambah buku
+// Pasang event listener setelah DOM siap
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('addBookForm');
-    if (!form) return;
-
-    form.addEventListener('submit', addBookModal);
+    if (form) {
+        form.addEventListener('submit', addBookToDatabase);
+    }
 });
 
-// Fungsi tambah buku (versi cocok HTML)
-async function addBookModal(event) {
+// Fungsi untuk tambah buku ke Firestore
+async function addBookToDatabase(event) {
     event.preventDefault();
 
     const title = document.getElementById('bookTitle').value.trim();
@@ -249,7 +251,7 @@ async function addBookModal(event) {
     const coverURL = document.getElementById('bookCoverURL').value.trim() || null;
 
     try {
-        await firebase.firestore().collection('books').add({
+        const docRef = await firebase.firestore().collection('books').add({
             title: title,
             author: author,
             description: description,
@@ -258,12 +260,20 @@ async function addBookModal(event) {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        alert('Buku berhasil ditambah!');
-        closeAddBookModal();
+        console.log("Berhasil menambah buku dengan ID:", docRef.id);
+        alert("Buku berhasil ditambah!");
+
+        // Reset form dan tutup modal
         document.getElementById('addBookForm').reset();
-        loadAdminBooks();
+        closeAddBookModal();
+
+        // Refresh daftar buku
+        if (typeof loadAdminBooks === 'function') {
+            loadAdminBooks();
+        }
     } catch (error) {
-        alert('Error: ' + error.message);
+        console.error("Gagal menambah buku:", error);
+        alert("Terjadi error: " + error.message);
     }
 }
 
