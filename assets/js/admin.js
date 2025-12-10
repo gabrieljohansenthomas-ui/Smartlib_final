@@ -184,7 +184,7 @@ function closeAddBookModal() {
 }
 
 // Fungsi untuk submit tambah buku
-async function submitAddBook(event) {
+async function addBookModal(event) {
     event.preventDefault();
     const title = document.getElementById('bookTitle').value;
     const author = document.getElementById('bookAuthor').value;
