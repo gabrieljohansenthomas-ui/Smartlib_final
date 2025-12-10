@@ -347,13 +347,14 @@ async function addBookToFirebase(event) {
     const author = document.getElementById('bookAuthor').value.trim();
     const description = document.getElementById('bookDescription').value.trim();
     const coverURL = document.getElementById('bookCoverURL').value.trim() || null;
-
+    const bookURL = document.getElementById('bookURL')?.value.trim() || null;
     try {
         const docRef = await firebase.firestore().collection('books').add({
             title: title,
             author: author,
             description: description,
             coverURL: coverURL,
+            bookURL: bookURL,
             available: true,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -396,6 +397,7 @@ async function editBook(bookId) {
         document.getElementById("editBookAuthor").value = bookData.author;
         document.getElementById("editBookDescription").value = bookData.description;
         document.getElementById("editBookCoverURL").value = bookData.coverURL || "";
+        document.getElementById("editBookURL").value = bookData.bookURL || "";
 
         // Tampilkan modal
         document.getElementById("editBookModal").classList.remove("hidden");
@@ -424,13 +426,14 @@ async function saveEditedBook(event) {
     const newAuthor = document.getElementById("editBookAuthor").value.trim();
     const newDescription = document.getElementById("editBookDescription").value.trim();
     const newCoverURL = document.getElementById("editBookCoverURL").value.trim() || null;
-
+    const newBookURL = document.getElementById("editBookURL").value.trim() || null;
     try {
         await firebase.firestore().collection("books").doc(currentEditBookId).update({
             title: newTitle,
             author: newAuthor,
             description: newDescription,
             coverURL: newCoverURL,
+            bookURL: newBookURL,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
