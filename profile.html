@@ -42,6 +42,8 @@
     <script>
         checkAuthAndRole('member');
         loadProfile();
+    // Hubungkan form dengan fungsi update
+    document.getElementById('profileForm').addEventListener('submit', updateProfile);
     </script>
 </body>
 </html>
