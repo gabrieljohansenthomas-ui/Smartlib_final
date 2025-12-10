@@ -64,6 +64,9 @@ async function deleteBook(id) {
 
 // ADMIN - KELOLA PEMINJAMAN
 
+// ======================================================
+// LOAD ADMIN BORROWS DENGAN DELETE DI KANAN
+// ======================================================
 async function loadAdminBorrows() {
     const borrowsList = document.getElementById('borrowsList');
     borrowsList.innerHTML = '';
@@ -71,7 +74,7 @@ async function loadAdminBorrows() {
     try {
         const snapshot = await firebase.firestore()
             .collection('borrow_records')
-            .orderBy('borrowDate', 'desc') // Pastikan semua dokumen punya borrowDate
+            .orderBy('borrowDate', 'desc')
             .get();
 
         if (snapshot.empty) {
@@ -122,26 +125,32 @@ async function loadAdminBorrows() {
             item.className = "bg-white shadow-lg rounded-xl p-5 border border-gray-200";
 
             item.innerHTML = `
-                <p><span class="font-semibold">User:</span> ${user.name}</p>
-                <p><span class="font-semibold">Buku:</span> ${book.title}</p>
-                <p class="${statusColor}"><span class="font-semibold">Status:</span> ${borrow.status}</p>
-                <p><span class="font-semibold">Tgl Pinjam:</span> ${borrowDate}</p>
-                ${returnDate ? `<p><span class="font-semibold">Tgl Kembali:</span> ${returnDate}</p>` : ""}
-                <div class="mt-3 space-x-2">
-                    ${borrow.status === "pending"
-                        ? `<button onclick="approveBorrow('${doc.id}', '${borrow.bookId}')"
-                             class="bg-green-600 text-white px-3 py-1 rounded-lg">Approve</button>
-                           <button onclick="rejectBorrow('${doc.id}')"
-                             class="bg-red-600 text-white px-3 py-1 rounded-lg">Reject</button>`
-                        : ""
-                    }
-                    ${borrow.status === "approved"
-                        ? `<button onclick="returnBook('${doc.id}', '${borrow.bookId}')"
-                             class="bg-blue-600 text-white px-3 py-1 rounded-lg">Kembalikan</button>`
-                        : ""
-                    }
-                    <button onclick="deleteBorrow('${doc.id}')"
-                        class="bg-gray-600 text-white px-3 py-1 rounded-lg">Hapus</button>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p><span class="font-semibold">User:</span> ${user.name}</p>
+                        <p><span class="font-semibold">Buku:</span> ${book.title}</p>
+                        <p class="${statusColor}"><span class="font-semibold">Status:</span> ${borrow.status}</p>
+                        <p><span class="font-semibold">Tgl Pinjam:</span> ${borrowDate}</p>
+                        ${returnDate ? `<p><span class="font-semibold">Tgl Kembali:</span> ${returnDate}</p>` : ""}
+                        <div class="mt-3 space-x-2">
+                            ${borrow.status === "pending"
+                                ? `<button onclick="approveBorrow('${doc.id}', '${borrow.bookId}')"
+                                     class="bg-green-600 text-white px-3 py-1 rounded-lg">Approve</button>
+                                   <button onclick="rejectBorrow('${doc.id}')"
+                                     class="bg-red-600 text-white px-3 py-1 rounded-lg">Reject</button>`
+                                : ""
+                            }
+                            ${borrow.status === "approved"
+                                ? `<button onclick="returnBook('${doc.id}', '${borrow.bookId}')"
+                                     class="bg-blue-600 text-white px-3 py-1 rounded-lg">Kembalikan</button>`
+                                : ""
+                            }
+                        </div>
+                    </div>
+                    <div>
+                        <button onclick="deleteBorrow('${doc.id}')"
+                            class="bg-gray-600 text-white px-3 py-1 rounded-lg">Hapus</button>
+                    </div>
                 </div>
             `;
 
@@ -153,6 +162,7 @@ async function loadAdminBorrows() {
         borrowsList.innerHTML = '<p class="text-red-600">Gagal memuat peminjaman.</p>';
     }
 }
+
 
 
 // ======================================================
