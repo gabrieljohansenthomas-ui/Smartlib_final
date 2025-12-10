@@ -50,7 +50,7 @@ async function loadAdminBooks() {
 }
 
 // Fungsi untuk tambah buku
-async function addBook(title, author, description, coverFile) {
+/* async function addBook(title, author, description, coverFile) {
     try {
         let coverURL = null;
         if (coverFile) {
@@ -72,7 +72,7 @@ async function addBook(title, author, description, coverFile) {
     } catch (error) {
         alert('Error: ' + error.message);
     }
-}
+} */
 
 // Fungsi untuk edit buku (simplified)
 async function editBook(id) {
@@ -171,3 +171,50 @@ async function loadMembers() {
 function viewMemberDetails(id) {
     alert('Fitur detail member belum diimplementasi lengkap. ID: ' + id);
 }
+
+// Fungsi untuk tampilkan modal tambah buku
+function showAddBookForm() {
+    document.getElementById('addBookModal').classList.remove('hidden');
+}
+
+// Fungsi untuk tutup modal
+function closeAddBookModal() {
+    document.getElementById('addBookModal').classList.add('hidden');
+    document.getElementById('addBookForm').reset();
+}
+
+// Fungsi untuk submit tambah buku
+async function submitAddBook(event) {
+    event.preventDefault();
+    const title = document.getElementById('bookTitle').value;
+    const author = document.getElementById('bookAuthor').value;
+    const description = document.getElementById('bookDescription').value;
+    const coverFile = document.getElementById('bookCover').files[0];
+
+    try {
+        let coverURL = null;
+        if (coverFile) {
+            const storageRef = firebase.storage().ref();
+            const coverRef = storageRef.child(`covers/${Date.now()}_${coverFile.name}`);
+            await coverRef.put(coverFile);
+            coverURL = await coverRef.getDownloadURL();
+        }
+
+        await firebase.firestore().collection('books').add({
+            title: title,
+            author: author,
+            description: description,
+            coverURL: coverURL || 'https://via.placeholder.com/150',
+            available: true
+        });
+
+        alert('Buku berhasil ditambahkan!');
+        closeAddBookModal();
+        loadAdminBooks(); // Reload daftar buku
+    } catch (error) {
+        alert('Error: ' + error.message);
+    }
+}
+
+// Event listener untuk form
+document.getElementById('addBookForm').addEventListener('submit', submitAddBook);
