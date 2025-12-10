@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Perpustakaan Digital SMK Negeri 3 Manado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white/70 backdrop-blur-md shadow-2xl rounded-2xl p-8 max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Selamat Datang di Sistem Perpustakaan Digital</h1>
+        <p class="text-gray-600 mb-6">SMK Negeri 3 Manado</p>
+        <div class="space-y-4">
+            <a href="login.html" class="block bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition duration-300">Login</a>
+            <a href="register.html" class="block bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition duration-300">Register</a>
+        </div>
+    </div>
+    <script>
+        // Redirect jika sudah login
+        checkAuthAndRedirect();
+    </script>
+</body>
+</html>
