@@ -15,7 +15,7 @@ async function loadBooks() {
                 <p class="text-gray-600">Penulis: ${book.author}</p>
                 <p class="text-gray-500">${book.description}</p>
                 <p class="text-gray-500">${book.description}</p>
-                ${book.bookURL ? `<a href="${book.bookURL}" target="_blank" class="mt-2 inline-block bg-indigo-600 text-white px-3 py-1 rounded-lg hover:bg-indigo-700 transition duration-300">Buka Buku</a>` : ''}
+                ${book.bookURL ? `<a href="${book.bookURL}" target="_blank" class="mt-2 inline-block bg-indigo-600 text-white px-3 py-1 rounded-lg hover:bg-indigo-700 transition duration-300">Detail Buku</a>` : ''}
             </div>
         `;
         booksList.innerHTML += bookCard;
